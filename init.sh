@@ -30,6 +30,11 @@ while [ $confirmed_creds != "y" ]; do
     read accesstoken
     echo -n "Access token secret: "
     read accesstokensecret
+    echo -n "Imgur ID: "
+    read imgurid
+    echo -n "Imgur secret: "
+    read imgursecret
+
 
     echo "We read these credentials:"
     cat <<EOF
@@ -37,6 +42,8 @@ TWITTER_CONSUMER_KEY=$consumerkey
 TWITTER_CONSUMER_SECRET=$consumersecret
 TWITTER_ACCESS_TOKEN=$accesstoken
 TWITTER_ACCESS_TOKEN_SECRET=$accesstokensecret
+IMGUR_CLIENT_ID=$imgurid
+IMGUR_SECRET=$imgursecret
 EOF
     echo "Is this correct? [y/n]"
     read confirmed_creds
@@ -50,7 +57,9 @@ echo "Sending your Twitter API credentials up to Heroku..."
 heroku config:add TWITTER_CONSUMER_KEY=$consumerkey \
     TWITTER_CONSUMER_SECRET=$consumersecret \
     TWITTER_ACCESS_TOKEN=$accesstoken \
-    TWITTER_ACCESS_TOKEN_SECRET=$accesstokensecret
+    TWITTER_ACCESS_TOKEN_SECRET=$accesstokensecret \
+    IMGUR_CLIENT_ID=$imgurid \
+    IMGUR_SECRET=$imgursecret
 
 #create a script for setting up your local environment
 cat <<EOF > setup_env.sh
@@ -58,6 +67,8 @@ export TWITTER_CONSUMER_KEY=$consumerkey
 export TWITTER_CONSUMER_SECRET=$consumersecret
 export TWITTER_ACCESS_TOKEN=$accesstoken
 export TWITTER_ACCESS_TOKEN_SECRET=$accesstokensecret
+export IMGUR_CLIENT_ID=$imgurid
+export IMGUR_SECRET=$imgursecret
 EOF
 
 echo

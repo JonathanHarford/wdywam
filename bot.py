@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import time
@@ -5,6 +7,8 @@ import re
 import random
 
 import tweepy
+from imgurpython import ImgurClient
+from draw_medal import draw_medal
 
 CONGRATS = (
     '(Opens envelope.)',
@@ -71,6 +75,11 @@ def get_medal_text(status, search_q, first_person):
     return ('@' + status.user.screen_name, medal_text)
 
 
+def upload_medal(path):
+    client = ImgurClient(os.environ.get('IMGUR_CLIENT_ID'),
+                         os.environ.get('IMGUR_SECRET'))
+    return client.upload_from_path(path)
+
 
 if __name__ == "__main__":
 
@@ -91,17 +100,20 @@ if __name__ == "__main__":
 
     for search_q in ('I DESERVE A MEDAL FOR ', 'I DESERVE AN AWARD FOR ',
               'I SHOULD GET A MEDAL FOR ', 'I SHOULD GET AN AWARD FOR '):
-        statii = twapi.search(q='"' + search_q + '"', count=15)
+        # statii = twapi.search(q='"' + search_q + '"', count=15)
+        statii = twapi.search(q='"' + search_q + '"', count=1)
         for status in statii:
             medal_data = get_medal_text(status, search_q=search_q, first_person=True)
             if medal_data:
-                print(medal_data[0] + ': ' + status.text)
-                print('{} {}{} {}'.format(random.choice(CONGRATS),
-                                        medal_data[0],
-                                        random.choice('.!'),
-                                        'http://imgur.com/blah'))
-                print(medal_data[1])
-                print()
+                # print(medal_data[0] + ': ' + status.text)
+                # print('{} {}{} {}'.format(random.choice(CONGRATS),
+                #                         medal_data[0],
+                #                         random.choice('.!'),
+                #                         'http://imgur.com/blah'))
+                # print(medal_data[1])
+                # print()
+                fn = draw_medal(medal_data[0], medal_data[1])
+                upload_medal(fn)
                 medals.append(medal_data)
 
 
