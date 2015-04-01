@@ -1,8 +1,12 @@
 #setup_env.sh contains Twitter API credentials. Don't commit!
 setup_env.sh
 
+init.sh
+*.jpg  # The original medal is a .jpEg
+
+
 .idea
-.idea/*
+.idea/
 .idea/workspace.xml
 
 # Byte-compiled / optimized / DLL files
