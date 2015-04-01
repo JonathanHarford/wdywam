@@ -3,5 +3,6 @@ bot.py does a search for up to 15 tweets that request an award. Then get_medal_t
 draw_medal takes the tuple as input and creates a medal image (using ImageMagick).
 
 TODO:
-Upload medal to imgur
+Track id of last tweet responded to in order to ensure we don't respond more than once to same tweet
+Upload medal to imgur UNDER WDYWAM ACCOUNT
 Respond to @wdywam tweets with imgur link.

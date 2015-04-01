@@ -72,7 +72,7 @@ def get_medal_text(status, search_q, first_person):
     if len(medal_text) < 9:
         return
 
-    return ('@' + status.user.screen_name, medal_text)
+    return {'medal_uname': status.user.screen_name, 'medal_text': medal_text}
 
 
 def upload_medal(path):
@@ -97,7 +97,6 @@ if __name__ == "__main__":
     twapi = tweepy.API(auth)
     medals = []
 
-
     for search_q in ('I DESERVE A MEDAL FOR ', 'I DESERVE AN AWARD FOR ',
               'I SHOULD GET A MEDAL FOR ', 'I SHOULD GET AN AWARD FOR '):
         # statii = twapi.search(q='"' + search_q + '"', count=15)
@@ -112,10 +111,14 @@ if __name__ == "__main__":
                 #                         'http://imgur.com/blah'))
                 # print(medal_data[1])
                 # print()
-                fn = draw_medal(medal_data[0], medal_data[1])
-                upload_medal(fn)
-                medals.append(medal_data)
 
+                fn = draw_medal(uname=medal_data['medal_uname'],
+                                text=medal_data['medal_text'])
+                imgur_data = upload_medal(fn)
+                medal_data.update({'deletehash': imgur_data['delete_hash'],
+                                   'link': imgur_data['link']})
+                print(medal_data)
+                medals.append(medal_data)
 
     # twapi.update_status(status="Hello, World!")
 

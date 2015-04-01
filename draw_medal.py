@@ -13,15 +13,6 @@ TEXT_WRAP_AT = 25
 YEAR_SIZE = 60
 YEAR_Y = 680
 
-  # Create text with
-  #   convert -size 320x100 xc:black -font ArialBk -pointsize 70 \
-  #         -fill white   -annotate +5+70 'Anthony' \
-  #         -gamma 2  +level 0,1000 -white-threshold 999 \
-  #         -morphology Distance Chebyshev:1,1000 -auto-level \
-  #         -shade 135x30 -auto-level +level 10,90% font_chebyshev.jpg
-
-# Then compose with Pin_Light
-
 font_stamp = Image()
 
 def draw_medal(uname, text):
@@ -57,5 +48,5 @@ def draw_medal(uname, text):
             draw(im)
             filename=time.strftime('%Y%m%d-%H%M%S' + uname) + '.jpg'
             im.save(filename=filename)
-            display(im)
+            # display(im)
     return filename
