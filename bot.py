@@ -8,7 +8,27 @@ import random
 
 import tweepy
 from imgurpython import ImgurClient
+from forbidden_words import FORBIDDEN_FRAGMENTS, FORBIDDEN_WORDS
 from draw_medal import draw_medal
+
+JUSTIFICATIONS = (
+    'I DESERVE A MEDAL FOR ',
+    'I DESERVE AN AWARD FOR ',
+    'I SHOULD GET A MEDAL FOR ',
+    'I SHOULD GET AN AWARD FOR ',
+)
+
+REPLACEMENT_WORDS = tuple(zip("""
+I
+ME
+MY
+AM
+""".strip().split(), """
+THEY
+THEM
+THEIR
+ARE
+""".strip().split()))
 
 CONGRATS = (
     '(Opens envelope.)',
@@ -19,57 +39,37 @@ CONGRATS = (
     "I'm so proud of you,"
 )
 
-#### Tweepy Status object:
-# {
-#  'contributors': None,
-#  'truncated': False,
-#  'text': 'My Top Followers in 2010: @tkang1 @serin23 @uhrunland @aliassculptor @kor0307 @yunki62. Find yours @ http://mytopfollowersin2010.com',
-#  'in_reply_to_status_id': None,
-#  'id': 21041793667694593,
-#  '_api': <tweepy.api.api object="" at="" 0x6bebc50="">,
-#  'author': <tweepy.models.user object="" at="" 0x6c16610="">,
-#  'retweeted': False,
-#  'coordinates': None,
-#  'source': 'My Top Followers in 2010',
-#  'in_reply_to_screen_name': None,
-#  'id_str': '21041793667694593',
-#  'retweet_count': 0,
-#  'in_reply_to_user_id': None,
-#  'favorited': False,
-#  'retweeted_status': <tweepy.models.status object="" at="" 0xb2b5190="">,
-#  'source_url': 'http://mytopfollowersin2010.com',
-#  'user': <tweepy.models.user object="" at="" 0x6c16610="">,
-#  'geo': None,
-#  'in_reply_to_user_id_str': None,
-#  'created_at': datetime.datetime(2011, 1, 1, 3, 15, 29),
-#  'in_reply_to_status_id_str': None,
-#  'place': None
-# }
+def get_medal_text(status, search_q):
 
-
-def get_medal_text(status, search_q, first_person):
-
-    # We don't want replies
     if status.in_reply_to_user_id_str:
+        print("INVALID (reply): " + status.text)
         return
 
-    # We don't want Retweets
     if 'RT' in status.text:
+        print("INVALID (retweet): " + status.text)
         return
+
+    for word in FORBIDDEN_FRAGMENTS:
+        if word in status.text:
+            print("INVALID (forbidden term): " + status.text)
+            return
+    for word in FORBIDDEN_WORDS:
+        if re.match(r'''\b''' + word + r'''\b''', status.text):
+            print("INVALID (forbidden term): " + status.text)
+            return
 
     # Split by "I deserve a medal for..."
     throwaway, medal_text = status.text.upper().split(search_q)
 
-    if first_person:
-        # We don't want "Toni should get a medal for..."
-        if not throwaway.endswith(' ') and len(throwaway) > 0:
-            return
+    # Replace I/ME/MY with THEY/THEM/THEIR
+    for pair in REPLACEMENT_WORDS:
+        medal_text = re.sub(r'''\b''' + pair[0] + r'''\b''', pair[1], medal_text)
 
-    # medal_text = medal_text.replace('\n','.')
-    medal_text = re.match(r'''[\w \+\-\'\&\$\=\@]+''', medal_text).group(0)
+    # Just get the rest of the sentence.
+    medal_text = re.match(r'''[\w \+\-\'\"\&\$\=\@\#\,\/]+''', medal_text).group(0)
 
-    # Suspiciously short.
     if len(medal_text) < 9:
+        print("INVALID (too short): " + status.text)
         return
 
     return {'medal_uname': status.user.screen_name, 'medal_text': medal_text}
@@ -90,35 +90,40 @@ if __name__ == "__main__":
     access_token = os.environ.get('TWITTER_ACCESS_TOKEN')
     access_token_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
     if not all((consumer_key, consumer_secret, access_token, access_token_secret)):
-        print(consumer_key, consumer_secret, access_token, access_token_secret)
         sys.exit("Environment variables not set.")
     auth.set_access_token(access_token, access_token_secret)
 
     twapi = tweepy.API(auth)
     medals = []
 
-    for search_q in ('I DESERVE A MEDAL FOR ', 'I DESERVE AN AWARD FOR ',
-              'I SHOULD GET A MEDAL FOR ', 'I SHOULD GET AN AWARD FOR '):
-        # statii = twapi.search(q='"' + search_q + '"', count=15)
-        statii = twapi.search(q='"' + search_q + '"', count=1)
-        for status in statii:
-            medal_data = get_medal_text(status, search_q=search_q, first_person=True)
-            if medal_data:
-                # print(medal_data[0] + ': ' + status.text)
-                # print('{} {}{} {}'.format(random.choice(CONGRATS),
-                #                         medal_data[0],
-                #                         random.choice('.!'),
-                #                         'http://imgur.com/blah'))
-                # print(medal_data[1])
-                # print()
+    for search_q in JUSTIFICATIONS:
+        src_statii = twapi.search(q='"' + search_q + '"', count=1)
+        for src_status in src_statii:
+            medal_data = get_medal_text(src_status, search_q=search_q)
 
+            if medal_data:
+
+                # Draw the medal
                 fn = draw_medal(uname=medal_data['medal_uname'],
                                 text=medal_data['medal_text'])
-                imgur_data = upload_medal(fn)
-                medal_data.update({'deletehash': imgur_data['delete_hash'],
-                                   'link': imgur_data['link']})
-                print(medal_data)
-                medals.append(medal_data)
+                #
+                # # Upload the medal
+                # imgur_data = upload_medal(fn)
+                # medal_data.update({'deletehash': imgur_data['deletehash'],
+                #                    'link': imgur_data['link']})
+                medal_data['link'] = 'http://blah'
+
+                # Tweet the medal
+                status_text = '{} {}{} {}'.format(random.choice(CONGRATS),
+                                                        '@' + medal_data['medal_uname'],
+                                                        random.choice('.!'),
+                                                        medal_data['link'])
+                print('')
+                print(src_status.text)
+                # twapi.update_status(status=status_text)
+                print(status_text)
+                print(medal_data['medal_text'])
+                print('')
 
     # twapi.update_status(status="Hello, World!")
 

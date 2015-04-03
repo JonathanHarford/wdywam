@@ -3,15 +3,12 @@ setup_env.sh
 
 init.sh
 *.jpg  # The original medal is a .jpEg
-
+forbidden_words.py
 
 .idea
-.idea/
-.idea/workspace.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
 # C extensions
 *.so
 
