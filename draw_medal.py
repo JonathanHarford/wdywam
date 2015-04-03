@@ -9,7 +9,7 @@ from wand.font import Font
 UNAME_Y = 320
 TEXT_SIZE = 35
 TEXT_Y = 440
-TEXT_WRAP_AT = 24
+TEXT_WRAP_AT = 25
 YEAR_SIZE = 60
 YEAR_Y = 680
 
@@ -39,7 +39,7 @@ def draw_medal(uname, text):
             draw.text(im.width // 2, UNAME_Y, '@'+uname)
 
             draw.font_size = TEXT_SIZE
-            draw.text_interline_spacing = -14
+            draw.text_interline_spacing = -15
             draw.text(im.width // 2, TEXT_Y, text)
 
             draw.font_size = YEAR_SIZE
