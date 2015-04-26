@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Bsed on https://github.com/zwass/heroku-twitterbot-starter
+
 import os
 import sys
 import time
@@ -10,6 +12,8 @@ import tweepy
 from imgurpython import ImgurClient
 from forbidden_words import FORBIDDEN_FRAGMENTS, FORBIDDEN_WORDS
 from draw_medal import draw_medal
+
+TWEETS_TO_GRAB = 1
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
@@ -38,6 +42,18 @@ CONGRATS = (
     'Congratulations,',
     "I'm so proud of you,"
 )
+
+def get_twapi():
+    consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
+    consumer_secret = os.environ.get('TWITTER_CONSUMER_SECRET')
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    access_token = os.environ.get('TWITTER_ACCESS_TOKEN')
+    access_token_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
+    if not all((consumer_key, consumer_secret, access_token, access_token_secret)):
+        sys.exit("Environment variables not set.")
+    auth.set_access_token(access_token, access_token_secret)
+
+    return tweepy.API(auth)
 
 def get_medal_text(status, search_q):
 
@@ -72,61 +88,66 @@ def get_medal_text(status, search_q):
         print("INVALID (too short): " + status.text)
         return
 
-    return {'medal_uname': status.user.screen_name, 'medal_text': medal_text}
+    return {'medal_uname': status.user.screen_name,
+            'medal_text': medal_text,
+            'src_status': src_status.text}
 
 
-def upload_medal(path):
+def imgur_upload_medal(path, uname, medal_text):
     client = ImgurClient(os.environ.get('IMGUR_CLIENT_ID'),
-                         os.environ.get('IMGUR_SECRET'))
-    return client.upload_from_path(path)
+                     os.environ.get('IMGUR_SECRET'))
 
+    config = {
+        'title': 'A medal for ' + uname,
+        'description': medal_text,
+    }
+    imgur_img = client.upload_from_path(path, config=config, anon=False)
+    # print(imgur_img)
+    return imgur_img
 
 if __name__ == "__main__":
 
-    # Auth stuff
-    consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
-    consumer_secret = os.environ.get('TWITTER_CONSUMER_SECRET')
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    access_token = os.environ.get('TWITTER_ACCESS_TOKEN')
-    access_token_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
-    if not all((consumer_key, consumer_secret, access_token, access_token_secret)):
-        sys.exit("Environment variables not set.")
-    auth.set_access_token(access_token, access_token_secret)
+    twapi = get_twapi()
+    last_id = 592326807854182400 # Keep track of latest id found
+    while True:  # Main loop
 
-    twapi = tweepy.API(auth)
-    medals = []
+        tweets = []
+        for search_q in JUSTIFICATIONS:
+            src_statii = twapi.search(q='"' + search_q + '"',
+                                      count=TWEETS_TO_GRAB,
+                                      since_id=last_id)
+            for src_status in src_statii:
 
-    for search_q in JUSTIFICATIONS:
-        src_statii = twapi.search(q='"' + search_q + '"', count=1)
-        for src_status in src_statii:
-            medal_data = get_medal_text(src_status, search_q=search_q)
+                medal_data = get_medal_text(src_status, search_q=search_q)
+                if not medal_data: continue
 
-            if medal_data:
+                medal_data['src_id'] = src_status.id
 
                 # Draw the medal
                 fn = draw_medal(uname=medal_data['medal_uname'],
                                 text=medal_data['medal_text'])
-                #
-                # # Upload the medal
-                # imgur_data = upload_medal(fn)
-                # medal_data.update({'deletehash': imgur_data['deletehash'],
-                #                    'link': imgur_data['link']})
-                medal_data['link'] = 'http://blah'
+
+                # Upload the medal
+                imgur_data = imgur_upload_medal(fn,
+                                                uname=medal_data['medal_uname'],
+                                                medal_text=medal_data['medal_text'])
+                medal_data['deletehash'] = imgur_data['deletehash']
+                medal_data['link'] =  imgur_data['link']
 
                 # Tweet the medal
-                status_text = '{} {}{} {}'.format(random.choice(CONGRATS),
-                                                        '@' + medal_data['medal_uname'],
-                                                        random.choice('.!'),
-                                                        medal_data['link'])
+                medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
+                                                           medal_data['medal_uname'],  # Exclude @ so they don't notice
+                                                           # '@' + medal_data['medal_uname'],
+                                                           random.choice('.!'),
+                                                           medal_data['link'])
                 print('')
-                print(src_status.text)
-                # twapi.update_status(status=status_text)
-                print(status_text)
-                print(medal_data['medal_text'])
+                tweets.append(medal_data)
+                print(medal_data)
+                # for k,v in medal_data.items():
+                #     print(k+': '+v)
                 print('')
 
-    # twapi.update_status(status="Hello, World!")
-
-    # while True:
-    #     #Send a tweet here!
-    #     time.sleep(60)
+        for tweet in tweets:
+            last_id = max(last_id, tweet['src_id'])
+            twapi.update_status(status=tweet['status'])
+        time.sleep(60 * 30)  # 30 minutes
