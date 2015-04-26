@@ -138,13 +138,12 @@ if __name__ == "__main__":
                 fn = draw_medal(uname=medal_data['medal_uname'],
                                 text=medal_data['medal_text'])
 
-                # # Upload the medal
-                # imgur_data = imgur_upload_medal(fn,
-                #                                 uname=medal_data['medal_uname'],
-                #                                 medal_text=medal_data['medal_text'])
-                # medal_data['deletehash'] = imgur_data['deletehash']
-                # medal_data['link'] =  imgur_data['link']
-                medal_data['link'] =  'DEBUGDEBUGDEBUG'
+                # Upload the medal
+                imgur_data = imgur_upload_medal(fn,
+                                                uname=medal_data['medal_uname'],
+                                                medal_text=medal_data['medal_text'])
+                medal_data['deletehash'] = imgur_data['deletehash']
+                medal_data['link'] =  imgur_data['link']
 
                 # Tweet the medal
                 medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
