@@ -57,7 +57,8 @@ def get_twapi():
 
 def get_medal_text(status, search_q):
 
-    if status.in_reply_to_user_id_str:
+    # Ignore mentions (unless they're directly to @wdywam)
+    if status.in_reply_to_user_id_str and not status.text.startswith('@wdywam'):
         print("INVALID (reply): " + status.text)
         return
 
@@ -112,6 +113,10 @@ if __name__ == "__main__":
     while True:  # Main loop
 
         tweets = []
+
+        # mentions = twapi.mentions_timeline(since_id=last_id)
+        # for src_status in mentions:
+
         for search_q in JUSTIFICATIONS:
             src_statii = twapi.search(q='"' + search_q + '"',
                                       count=TWEETS_TO_GRAB,
@@ -136,18 +141,18 @@ if __name__ == "__main__":
 
                 # Tweet the medal
                 medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
-                                                           medal_data['medal_uname'],  # Exclude @ so they don't notice
+                                                           medal_data['medal_uname'],  # DEBUG Exclude @ so they don't notice
                                                            # '@' + medal_data['medal_uname'],
                                                            random.choice('.!'),
                                                            medal_data['link'])
                 print('')
                 tweets.append(medal_data)
-                print(medal_data)
-                # for k,v in medal_data.items():
-                #     print(k+': '+v)
+                # print(medal_data)
+                for k,v in medal_data.items():
+                    print('{}: {}'.format(k,v))
                 print('')
 
         for tweet in tweets:
             last_id = max(last_id, tweet['src_id'])
             twapi.update_status(status=tweet['status'])
-        time.sleep(60 * 30)  # 30 minutes
+        time.sleep(60)
