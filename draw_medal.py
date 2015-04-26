@@ -30,7 +30,7 @@ def draw_medal(uname, text):
 
     with Image(filename='medal.jpeg') as im:
         with Drawing() as draw:
-            draw.font = "DejaVu-Sans-Mono-Bold"
+            # draw.font = "DejaVu-Sans-Mono-Bold"
             draw.text_alignment = 'center'
             draw.fill_color = Color('#a70')
             draw.text_antialias = True
