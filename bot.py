@@ -10,10 +10,10 @@ import random
 
 import tweepy
 from imgurpython import ImgurClient
-from forbidden_words import FORBIDDEN_FRAGMENTS, FORBIDDEN_WORDS
 from draw_medal import draw_medal
 
-TWEETS_TO_GRAB = 1
+TWEETS_TO_GRAB = 5  # Per justification
+last_id = 592326807854182400 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
@@ -43,6 +43,11 @@ CONGRATS = (
     "I'm so proud of you,"
 )
 
+# These are for filtering out bad words. I couldn't bring myself to commit a file with such nastiness in
+# it so I use environment variables instead.
+forbidden_words = os.environ.get('FORBIDDEN_WORDS').split('-');
+forbidden_fragments = os.environ.get('FORBIDDEN_FRAGMENTS').split('-');
+
 def get_twapi():
     consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
     consumer_secret = os.environ.get('TWITTER_CONSUMER_SECRET')
@@ -52,7 +57,6 @@ def get_twapi():
     if not all((consumer_key, consumer_secret, access_token, access_token_secret)):
         sys.exit("Environment variables not set.")
     auth.set_access_token(access_token, access_token_secret)
-
     return tweepy.API(auth)
 
 def get_medal_text(status, search_q):
@@ -66,11 +70,11 @@ def get_medal_text(status, search_q):
         print("INVALID (retweet): " + status.text)
         return
 
-    for word in FORBIDDEN_FRAGMENTS:
+    for word in forbidden_fragments:
         if word in status.text:
             print("INVALID (forbidden term): " + status.text)
             return
-    for word in FORBIDDEN_WORDS:
+    for word in forbidden_words:
         if re.match(r'''\b''' + word + r'''\b''', status.text):
             print("INVALID (forbidden term): " + status.text)
             return
@@ -96,7 +100,7 @@ def get_medal_text(status, search_q):
 
 def imgur_upload_medal(path, uname, medal_text):
     client = ImgurClient(os.environ.get('IMGUR_CLIENT_ID'),
-                     os.environ.get('IMGUR_SECRET'))
+                         os.environ.get('IMGUR_SECRET'))
 
     config = {
         'title': 'A medal for ' + uname,
@@ -109,7 +113,7 @@ def imgur_upload_medal(path, uname, medal_text):
 if __name__ == "__main__":
 
     twapi = get_twapi()
-    last_id = 592326807854182400 # Keep track of latest id found
+
     while True:  # Main loop
 
         tweets = []
@@ -122,6 +126,8 @@ if __name__ == "__main__":
                                       count=TWEETS_TO_GRAB,
                                       since_id=last_id)
             for src_status in src_statii:
+
+                last_id = max(last_id, src_status.id)
 
                 medal_data = get_medal_text(src_status, search_q=search_q)
                 if not medal_data: continue
@@ -153,6 +159,5 @@ if __name__ == "__main__":
                 print('')
 
         for tweet in tweets:
-            last_id = max(last_id, tweet['src_id'])
             twapi.update_status(status=tweet['status'])
         time.sleep(60)
