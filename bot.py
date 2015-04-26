@@ -13,7 +13,7 @@ from imgurpython import ImgurClient
 from draw_medal import draw_medal
 
 TWEETS_TO_GRAB = 5  # Per justification
-last_id = 592326807854182400 # Keep track of latest id found
+last_id = 592449095043776512 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',

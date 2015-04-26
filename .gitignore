@@ -3,7 +3,6 @@ setup_env.sh
 
 init.sh
 *.jpg  # The original medal is a .jpEg
-forbidden_words.py
 
 .idea
 
