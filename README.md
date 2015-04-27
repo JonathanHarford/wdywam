@@ -3,5 +3,4 @@ bot.py does a search for up to 15 tweets that request an award. Then get_medal_t
 draw_medal takes the tuple as input and creates a medal image (using ImageMagick).
 
 TODO:
-Draw medals on Heroku!
 Delete all tweets (for development)

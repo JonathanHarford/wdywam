@@ -12,6 +12,11 @@ import tweepy
 from imgurpython import ImgurClient
 from draw_medal import draw_medal
 
+# DEBUG
+UPLOAD_TO_IMGUR = True
+POST_TWEET = True
+
+
 TWEETS_TO_GRAB = 5  # Per justification
 last_id = 592449095043776512 # Keep track of latest id found
 
@@ -139,11 +144,14 @@ if __name__ == "__main__":
                                 text=medal_data['medal_text'])
 
                 # Upload the medal
-                imgur_data = imgur_upload_medal(fn,
-                                                uname=medal_data['medal_uname'],
-                                                medal_text=medal_data['medal_text'])
-                medal_data['deletehash'] = imgur_data['deletehash']
-                medal_data['link'] =  imgur_data['link']
+                if UPLOAD_TO_IMGUR:
+                    imgur_data = imgur_upload_medal(fn,
+                                                    uname=medal_data['medal_uname'],
+                                                    medal_text=medal_data['medal_text'])
+                    medal_data['deletehash'] = imgur_data['deletehash']
+                    medal_data['link'] =  imgur_data['link']
+                else:
+                    medal_data['link'] = 'http://DEBUG.DEBUG/DEBUG'
 
                 # Tweet the medal
                 medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
@@ -155,7 +163,9 @@ if __name__ == "__main__":
 
         # Post the tweets
         for tweet in tweets:
-            twapi.update_status(status=tweet['status'])
+            # if POST_TWEET:
+            #     twapi.update_status(status=tweet['status'])
+            print(tweet['src_id'])
             print(tweet['src_status'])
             print(tweet['status'])
             print('')

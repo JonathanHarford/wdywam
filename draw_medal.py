@@ -39,7 +39,7 @@ def draw_medal(uname, text):
             draw.text(im.width // 2, UNAME_Y, '@'+uname)
 
             draw.font_size = TEXT_SIZE
-            draw.text_interline_spacing = -14
+            draw.text_interline_spacing = -10
             draw.text(im.width // 2, TEXT_Y, text)
 
             draw.font_size = YEAR_SIZE
