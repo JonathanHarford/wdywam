@@ -128,45 +128,44 @@ if __name__ == "__main__":
         # mentions = twapi.mentions_timeline(since_id=last_id)
         # for src_status in mentions:
 
-        src_statii = []
+
         for search_q in JUSTIFICATIONS:
-            src_statii += twapi.search(q='"' + search_q + '"',
+            src_statii = twapi.search(q='"' + search_q + '"',
                                       count=TWEETS_TO_GRAB,
                                       since_id=last_id)
 
-        for src_status in src_statii:
+            for src_status in src_statii:
 
-            last_id = max(last_id, src_status.id)
+                medal_data = get_medal_text(src_status, search_q=search_q)
+                if not medal_data: continue
 
-            medal_data = get_medal_text(src_status, search_q=search_q)
-            if not medal_data: continue
+                medal_data['src_id'] = src_status.id
 
-            medal_data['src_id'] = src_status.id
+                # Draw the medal
+                fn = draw_medal(uname=medal_data['medal_uname'],
+                                text=medal_data['medal_text'])
 
-            # Draw the medal
-            fn = draw_medal(uname=medal_data['medal_uname'],
-                            text=medal_data['medal_text'])
+                # Upload the medal
+                if UPLOAD_TO_IMGUR:
+                    imgur_data = imgur_upload_medal(fn,
+                                                    uname=medal_data['medal_uname'],
+                                                    medal_text=medal_data['medal_text'])
+                    medal_data['deletehash'] = imgur_data['deletehash']
+                    medal_data['link'] =  imgur_data['link']
+                else:
+                    medal_data['link'] = 'http://DEBUG.DEBUG/DEBUG'
 
-            # Upload the medal
-            if UPLOAD_TO_IMGUR:
-                imgur_data = imgur_upload_medal(fn,
-                                                uname=medal_data['medal_uname'],
-                                                medal_text=medal_data['medal_text'])
-                medal_data['deletehash'] = imgur_data['deletehash']
-                medal_data['link'] =  imgur_data['link']
-            else:
-                medal_data['link'] = 'http://DEBUG.DEBUG/DEBUG'
-
-            # Tweet the medal
-            reply_uname = ('@'+medal_data['medal_uname']) if TRACEABLE_MENTION else medal_data['medal_uname']
-            medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
-                                                       reply_uname,
-                                                       random.choice('.!'),
-                                                       medal_data['link'])
-            tweets.append(medal_data)
+                # Tweet the medal
+                reply_uname = ('@'+medal_data['medal_uname']) if TRACEABLE_MENTION else medal_data['medal_uname']
+                medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
+                                                           reply_uname,
+                                                           random.choice('.!'),
+                                                           medal_data['link'])
+                tweets.append(medal_data)
 
         # Post the tweets
         for tweet in tweets:
+            last_id = max(last_id, tweet['src_id'])
             if POST_TWEET:
                 twapi.update_status(status=tweet['status'],in_reply_to_status_id=tweet['src_id'])
             print('{}: {} => {} ({})'.format(tweet['src_id'],tweet['src_status'],tweet['status'],tweet['deletehash']))
