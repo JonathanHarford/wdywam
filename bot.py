@@ -14,12 +14,12 @@ from draw_medal import draw_medal
 
 # DEBUG
 UPLOAD_TO_IMGUR = True
-TRACEABLE_MENTION = False
-POST_TWEET = False
+TRACEABLE_MENTION = True
+POST_TWEET = True
 
 
 TWEETS_TO_GRAB = 5  # Per justification
-last_id = 592449095043776512 # Keep track of latest id found
+last_id = 592518652303417344 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
@@ -165,10 +165,9 @@ if __name__ == "__main__":
 
         # Post the tweets
         for tweet in tweets:
-            # if POST_TWEET:
-            #     twapi.update_status(status=tweet['status'])
-            print(tweet['src_id'])
-            print(tweet['src_status'])
+            if POST_TWEET:
+                twapi.update_status(status=tweet['status'])
+            print('{}: {}'.format(tweet['src_id'],tweet['src_status']))
             print(tweet['status'])
             print('')
 
