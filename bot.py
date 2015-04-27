@@ -14,7 +14,8 @@ from draw_medal import draw_medal
 
 # DEBUG
 UPLOAD_TO_IMGUR = True
-POST_TWEET = True
+TRACEABLE_MENTION = False
+POST_TWEET = False
 
 
 TWEETS_TO_GRAB = 5  # Per justification
@@ -40,9 +41,10 @@ ARE
 """.strip().split()))
 
 CONGRATS = (
-    '(Opens envelope.)',
+    'And the winner is... (opens envelope)',
     'Congrats,',
     'Here you go,',
+    'Way to go,',
     'And the award goes to...',
     'Congratulations,',
     "I'm so proud of you,"
@@ -154,9 +156,9 @@ if __name__ == "__main__":
                     medal_data['link'] = 'http://DEBUG.DEBUG/DEBUG'
 
                 # Tweet the medal
+                reply_uname = ('@'+medal_data['medal_uname']) if TRACEABLE_MENTION else medal_data['medal_uname']
                 medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
-                                                           medal_data['medal_uname'],  # DEBUG Exclude @ so they don't notice
-                                                           # '@' + medal_data['medal_uname'],
+                                                           reply_uname,
                                                            random.choice('.!'),
                                                            medal_data['link'])
                 tweets.append(medal_data)
