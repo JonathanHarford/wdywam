@@ -71,7 +71,7 @@ def get_twapi():
     return tweepy.API(auth)
 
 
-def get_medal_text(status, search_q):
+def get_medal_text(status, q):
 
     # Ignore mentions (unless they're directly to @wdywam)
     if status.in_reply_to_user_id_str and not status.text.startswith('@wdywam'):
@@ -93,7 +93,7 @@ def get_medal_text(status, search_q):
 
     # Split by "I deserve a medal for..."
     try:
-        throwaway, medal_text = status.text.upper().split(search_q)
+        throwaway, medal_text = status.text.upper().split(q)
     except ValueError:
         return
 
@@ -122,7 +122,6 @@ if __name__ == "__main__":
     while True:  # Main loop
 
         last_id = new_last_id
-        print(last_id)
 
         for search_q in JUSTIFICATIONS:
             src_statii = twapi.search(q='"' + search_q + '"',
@@ -130,12 +129,12 @@ if __name__ == "__main__":
                                       since_id=last_id)
 
             for src_status in src_statii:
-                print(src_status.text)
 
                 new_last_id = max(new_last_id, src_status.id)
 
-                tweet = get_medal_text(src_status, search_q=search_q)
-                if not tweet: continue
+                tweet = get_medal_text(src_status, q=search_q)
+                if not tweet:
+                    continue
 
                 # Draw the medal
                 tweet['fn'] = draw_medal(uname=tweet['medal_uname'],
@@ -153,4 +152,4 @@ if __name__ == "__main__":
                 print('{}: {} => {}'.format(src_status.id, tweet['src_status'], tweet['status']))
 
         time.sleep(300)  # 5 minutes
-
+new_last_id
