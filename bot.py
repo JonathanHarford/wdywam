@@ -9,7 +9,7 @@ import re
 import random
 
 import tweepy
-from imgurpython import ImgurClient
+
 from draw_medal import draw_medal
 
 # DEBUG
@@ -19,21 +19,27 @@ POST_TWEET = True
 
 
 TWEETS_TO_GRAB = 5  # Per justification
-last_id = 592645239250157569 # Keep track of latest id found
+new_last_id = last_id = 592840994854428675 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
     'I DESERVE AN AWARD FOR ',
     'I SHOULD GET A MEDAL FOR ',
     'I SHOULD GET AN AWARD FOR ',
+    'I AM BEST AT ',
+    'I AM THE BEST AT ',
 )
 
 REPLACEMENT_WORDS = tuple(zip("""
+I'D
+I'M
 I
 ME
 MY
 AM
 """.strip().split(), """
+THEY'D
+THEY'RE
 THEY
 THEM
 THEIR
@@ -104,30 +110,11 @@ def get_medal_text(status, search_q):
             'medal_text': medal_text,
             'src_status': src_status.text}
 
-
-def imgur_upload_medal(path, uname, medal_text):
-    client = ImgurClient(os.environ.get('IMGUR_CLIENT_ID'),
-                         os.environ.get('IMGUR_SECRET'))
-
-    config = {
-        'title': 'A medal for ' + uname,
-        'description': medal_text,
-    }
-    imgur_img = client.upload_from_path(path, config=config, anon=False)
-    # print(imgur_img)
-    return imgur_img
-
 if __name__ == "__main__":
 
     twapi = get_twapi()
 
     while True:  # Main loop
-
-        tweets = []
-
-        # mentions = twapi.mentions_timeline(since_id=last_id)
-        # for src_status in mentions:
-
 
         for search_q in JUSTIFICATIONS:
             src_statii = twapi.search(q='"' + search_q + '"',
@@ -136,38 +123,25 @@ if __name__ == "__main__":
 
             for src_status in src_statii:
 
-                medal_data = get_medal_text(src_status, search_q=search_q)
-                if not medal_data: continue
+                new_last_id = max(new_last_id, src_status.id)
 
-                medal_data['src_id'] = src_status.id
+                tweet = get_medal_text(src_status, search_q=search_q)
+                if not tweet: continue
 
                 # Draw the medal
-                fn = draw_medal(uname=medal_data['medal_uname'],
-                                text=medal_data['medal_text'])
-
-                # Upload the medal
-                if UPLOAD_TO_IMGUR:
-                    imgur_data = imgur_upload_medal(fn,
-                                                    uname=medal_data['medal_uname'],
-                                                    medal_text=medal_data['medal_text'])
-                    medal_data['deletehash'] = imgur_data['deletehash']
-                    medal_data['link'] =  imgur_data['link']
-                else:
-                    medal_data['link'] = 'http://DEBUG.DEBUG/DEBUG'
+                tweet['fn'] = draw_medal(uname=tweet['medal_uname'],
+                                         text=tweet['medal_text'])
 
                 # Tweet the medal
-                reply_uname = ('@'+medal_data['medal_uname']) if TRACEABLE_MENTION else medal_data['medal_uname']
-                medal_data['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
+                reply_uname = ('@'+tweet['medal_uname']) if TRACEABLE_MENTION else tweet['medal_uname']
+                tweet['status'] = '{} {}{}'.format(random.choice(CONGRATS),
                                                            reply_uname,
-                                                           random.choice('.!'),
-                                                           medal_data['link'])
-                tweets.append(medal_data)
+                                                           random.choice('.!'))
+                if POST_TWEET:
+                    twapi.update_with_media(filename=tweet['fn'],
+                                            status=tweet['status'],
+                                            in_reply_to_status_id=src_status.id)
+                print('{}: {} => {}'.format(src_status.id, tweet['src_status'], tweet['status']))
 
-        # Post the tweets
-        for tweet in tweets:
-            last_id = max(last_id, tweet['src_id'])
-            if POST_TWEET:
-                twapi.update_status(status=tweet['status'],in_reply_to_status_id=tweet['src_id'])
-            print('{}: {} => {} ({})'.format(tweet['src_id'],tweet['src_status'],tweet['status'],tweet['deletehash']))
-
+        last_id = new_last_id
         time.sleep(600)
