@@ -150,3 +150,4 @@ if __name__ == "__main__":
 
         last_id = new_last_id
         time.sleep(600)
+        print('.')
