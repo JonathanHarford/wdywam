@@ -130,6 +130,7 @@ if __name__ == "__main__":
                                       since_id=last_id)
 
             for src_status in src_statii:
+                print(src_status.text)
 
                 new_last_id = max(new_last_id, src_status.id)
 
