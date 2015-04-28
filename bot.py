@@ -117,9 +117,12 @@ if __name__ == "__main__":
     twapi = get_twapi()
 
     # Get ID of most recent tweet
-    new_last_id = last_id = twapi.me().status.id  # Keep track of latest id found
+    new_last_id = twapi.me().status.id  # Keep track of latest id found
 
     while True:  # Main loop
+
+        last_id = new_last_id
+        print(last_id)
 
         for search_q in JUSTIFICATIONS:
             src_statii = twapi.search(q='"' + search_q + '"',
@@ -148,7 +151,5 @@ if __name__ == "__main__":
                                             in_reply_to_status_id=src_status.id)
                 print('{}: {} => {}'.format(src_status.id, tweet['src_status'], tweet['status']))
 
-        last_id = new_last_id
-        print('.')
-        time.sleep(600)
+        time.sleep(300)  # 5 minutes
 
