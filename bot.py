@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Bsed on https://github.com/zwass/heroku-twitterbot-starter
+# Based on https://github.com/zwass/heroku-twitterbot-starter
 
 import os
 import sys
@@ -13,13 +13,12 @@ import tweepy
 from draw_medal import draw_medal
 
 # DEBUG
-UPLOAD_TO_IMGUR = True
 TRACEABLE_MENTION = True
-POST_TWEET = True
+POST_TWEET = False
 
 
 TWEETS_TO_GRAB = 5  # Per justification
-new_last_id = last_id = 592840994854428675 # Keep track of latest id found
+new_last_id = last_id = 592859314693525505 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
@@ -93,7 +92,10 @@ def get_medal_text(status, search_q):
             return
 
     # Split by "I deserve a medal for..."
-    throwaway, medal_text = status.text.upper().split(search_q)
+    try:
+        throwaway, medal_text = status.text.upper().split(search_q)
+    except ValueError:
+        return
 
     # Replace I/ME/MY with THEY/THEM/THEIR
     for pair in REPLACEMENT_WORDS:
