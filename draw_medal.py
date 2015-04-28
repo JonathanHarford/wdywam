@@ -17,6 +17,18 @@ font_stamp = Image()
 
 def draw_medal(uname, text):
 
+    def draw_text(color, offset):
+        draw.fill_color = color
+        draw.font_size = 700/(len(uname)+1)
+        draw.text(im.width // 2 + offset[0], UNAME_Y + offset[1], '@'+uname)
+
+        draw.font_size = TEXT_SIZE
+        draw.text_interline_spacing = -4
+        draw.text(im.width // 2 + offset[0], TEXT_Y + offset[1], text)
+
+        draw.font_size = YEAR_SIZE
+        draw.text(im.width // 2 + offset[0], YEAR_Y + offset[1], time.strftime('%Y'))
+
     # Inserting linebreaks!
     last_linebreak = last_space = 0
     text = list(text.upper())  # Let's get mutable!
@@ -32,18 +44,13 @@ def draw_medal(uname, text):
         with Drawing() as draw:
             # draw.font = "DejaVu-Sans-Mono-Bold"
             draw.text_alignment = 'center'
-            draw.fill_color = Color('#a70')
             draw.text_antialias = True
+            draw_text(Color('#730'), (1, 3))
+            draw_text(Color('#eda'), (-1 ,-3))
+            draw_text(Color('#da2'), (0, 0))
 
-            draw.font_size = 700/(len(uname)+1)
-            draw.text(im.width // 2, UNAME_Y, '@'+uname)
 
-            draw.font_size = TEXT_SIZE
-            draw.text_interline_spacing = -4
-            draw.text(im.width // 2, TEXT_Y, text)
 
-            draw.font_size = YEAR_SIZE
-            draw.text(im.width // 2, YEAR_Y, time.strftime('%Y'))
 
             draw(im)
             filename=time.strftime('%Y%m%d-%H%M%S' + uname) + '.jpg'
