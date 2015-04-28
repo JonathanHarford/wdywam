@@ -23,7 +23,7 @@ def draw_medal(uname, text):
         draw.text(im.width // 2 + offset[0], UNAME_Y + offset[1], '@'+uname)
 
         draw.font_size = TEXT_SIZE
-        draw.text_interline_spacing = -4
+        draw.text_interline_spacing = 2
         draw.text(im.width // 2 + offset[0], TEXT_Y + offset[1], text)
 
         draw.font_size = YEAR_SIZE
@@ -45,12 +45,10 @@ def draw_medal(uname, text):
             # draw.font = "DejaVu-Sans-Mono-Bold"
             draw.text_alignment = 'center'
             draw.text_antialias = True
+
             draw_text(Color('#730'), (1, 3))
             draw_text(Color('#eda'), (-1 ,-3))
             draw_text(Color('#da2'), (0, 0))
-
-
-
 
             draw(im)
             filename=time.strftime('%Y%m%d-%H%M%S' + uname) + '.jpg'

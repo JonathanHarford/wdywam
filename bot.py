@@ -16,9 +16,7 @@ from draw_medal import draw_medal
 TRACEABLE_MENTION = True
 POST_TWEET = True
 
-
 TWEETS_TO_GRAB = 5  # Per justification
-new_last_id = last_id = 592859314693525505 # Keep track of latest id found
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
@@ -57,8 +55,9 @@ CONGRATS = (
 
 # These are for filtering out bad words. I couldn't bring myself to commit a file with such nastiness in
 # it so I use environment variables instead.
-forbidden_words = os.environ.get('FORBIDDEN_WORDS').split('-');
-forbidden_fragments = os.environ.get('FORBIDDEN_FRAGMENTS').split('-');
+forbidden_words = os.environ.get('FORBIDDEN_WORDS').split('-')
+forbidden_fragments = os.environ.get('FORBIDDEN_FRAGMENTS').split('-')
+
 
 def get_twapi():
     consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
@@ -70,6 +69,7 @@ def get_twapi():
         sys.exit("Environment variables not set.")
     auth.set_access_token(access_token, access_token_secret)
     return tweepy.API(auth)
+
 
 def get_medal_text(status, search_q):
 
@@ -102,7 +102,7 @@ def get_medal_text(status, search_q):
         medal_text = re.sub(r'''\b''' + pair[0] + r'''\b''', pair[1], medal_text)
 
     # Just get the rest of the sentence.
-    medal_text = re.match(r'''[\w \+\-\'\"\&\$\=\@\#\,\/]+''', medal_text).group(0)
+    medal_text = re.match(r'''[\w \+\-\'\"&$=@#,/]+''', medal_text).group(0)
 
     if len(medal_text) < 9:
         # print("INVALID (too short): " + status.text)
@@ -115,6 +115,9 @@ def get_medal_text(status, search_q):
 if __name__ == "__main__":
 
     twapi = get_twapi()
+
+    # Get ID of most recent tweet
+    new_last_id = last_id = twapi.me().status.id  # Keep track of latest id found
 
     while True:  # Main loop
 
@@ -137,8 +140,8 @@ if __name__ == "__main__":
                 # Tweet the medal
                 reply_uname = ('@'+tweet['medal_uname']) if TRACEABLE_MENTION else tweet['medal_uname']
                 tweet['status'] = '{} {}{}'.format(random.choice(CONGRATS),
-                                                           reply_uname,
-                                                           random.choice('.!'))
+                                                   reply_uname,
+                                                   random.choice('.!'))
                 if POST_TWEET:
                     twapi.update_with_media(filename=tweet['fn'],
                                             status=tweet['status'],
