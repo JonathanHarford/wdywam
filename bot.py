@@ -149,5 +149,6 @@ if __name__ == "__main__":
                 print('{}: {} => {}'.format(src_status.id, tweet['src_status'], tweet['status']))
 
         last_id = new_last_id
-        time.sleep(600)
         print('.')
+        time.sleep(600)
+
