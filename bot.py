@@ -16,7 +16,7 @@ from draw_medal import draw_medal
 # DEBUG
 UPLOAD_TO_IMGUR = True
 TRACEABLE_MENTION = True
-POST_TWEET = False
+POST_TWEET = True
 
 TWEETS_TO_GRAB = 5  # Per justification
 
