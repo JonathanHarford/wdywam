@@ -174,9 +174,11 @@ if __name__ == "__main__":
                                                       tweet['link']
                                                       )
                 if POST_TWEET:
-                    twapi.update_with_media(filename=tweet['fn'],
-                                            status=tweet['status'],
-                                            in_reply_to_status_id=src_status.id)
+                    # twapi.update_with_media(filename=tweet['fn'],
+                    #                         status=tweet['status'],
+                    #                         in_reply_to_status_id=src_status.id)
+                    twapi.update_status(status=tweet['status'],
+                                        in_reply_to_status_id=src_status.id)
                 print('{}: {} => {} ({})'.format(src_status.id,
                                                  tweet['src_status'],
                                                  tweet['status'],

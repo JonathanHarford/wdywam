@@ -19,7 +19,7 @@ def draw_medal(uname, text):
 
     def draw_text(color, offset):
         draw.fill_color = color
-        draw.font_size = 700/(len(uname)+1)
+        draw.font_size = 600/(len(uname)+1)
         draw.text(im.width // 2 + offset[0], UNAME_Y + offset[1], '@'+uname)
 
         draw.font_size = TEXT_SIZE
