@@ -18,15 +18,11 @@ UPLOAD_TO_IMGUR = True
 TRACEABLE_MENTION = True
 POST_TWEET = True
 
-TWEETS_TO_GRAB = 5  # Per justification
+TWEETS_TO_GRAB = 2  # Per justification
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
-    'I DESERVE AN AWARD FOR ',
-    'I SHOULD GET A MEDAL FOR ',
-    'I SHOULD GET AN AWARD FOR ',
-    'I AM BEST AT ',
-    'I AM THE BEST AT ',
+    'I SHOULD GET A MEDAL FOR '
 )
 
 REPLACEMENT_WORDS = tuple(zip("""
@@ -98,6 +94,11 @@ def get_medal_text(status, q):
         throwaway, medal_text = status.text.upper().split(q)
     except ValueError:
         return
+
+    # Some characters are too ambiguous.
+    for chr in ('@', '#'):
+        if chr in medal_text:
+            return
 
     # Replace I/ME/MY with THEY/THEM/THEIR
     for pair in REPLACEMENT_WORDS:
@@ -184,4 +185,4 @@ if __name__ == "__main__":
                                                  tweet['status'],
                                                  tweet['deletehash']))
 
-        time.sleep(300)  # 5 minutes
+        time.sleep(1800)  # 30 minutes
