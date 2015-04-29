@@ -185,4 +185,4 @@ if __name__ == "__main__":
                                                  tweet['status'],
                                                  tweet['deletehash']))
 
-        time.sleep(1800)  # 30 minutes
+        time.sleep(3600)  # 60 minutes
