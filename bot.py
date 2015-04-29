@@ -155,16 +155,16 @@ if __name__ == "__main__":
                 tweet['fn'] = draw_medal(uname=tweet['medal_uname'],
                                          text=tweet['medal_text'])
 
-            # Upload the medal
-            if UPLOAD_TO_IMGUR:
-                imgur_data = imgur_upload_medal(tweet['fn'],
-                                                uname=tweet['medal_uname'],
-                                                medal_text=tweet['medal_text'])
-                tweet['deletehash'] = imgur_data['deletehash']
-                tweet['link'] = imgur_data['link']
-            else:
-                tweet['deletehash'] = 'TESTDELETEHASH'
-                tweet['link'] = 'http://DEBUG.DEBUG/DEBUG'
+                # Upload the medal
+                if UPLOAD_TO_IMGUR:
+                    imgur_data = imgur_upload_medal(tweet['fn'],
+                                                    uname=tweet['medal_uname'],
+                                                    medal_text=tweet['medal_text'])
+                    tweet['deletehash'] = imgur_data['deletehash']
+                    tweet['link'] = imgur_data['link']
+                else:
+                    tweet['deletehash'] = 'TESTDELETEHASH'
+                    tweet['link'] = 'http://DEBUG.DEBUG/DEBUG'
 
                 # Tweet the medal
                 reply_uname = ('@'+tweet['medal_uname']) if TRACEABLE_MENTION else tweet['medal_uname']
