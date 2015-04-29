@@ -46,8 +46,8 @@ def draw_medal(uname, text):
             draw.text_alignment = 'center'
             draw.text_antialias = True
 
-            draw_text(Color('#730'), (1, 3))
-            draw_text(Color('#eda'), (-1 ,-3))
+            draw_text(Color('#730'), (1, 3))  # Shadow
+            draw_text(Color('#eda'), (-1 ,-3))  # Shine
             draw_text(Color('#da2'), (0, 0))
 
             draw(im)

@@ -161,7 +161,7 @@ if __name__ == "__main__":
                                                 uname=tweet['medal_uname'],
                                                 medal_text=tweet['medal_text'])
                 tweet['deletehash'] = imgur_data['deletehash']
-                tweet['link'] =  imgur_data['link']
+                tweet['link'] = imgur_data['link']
             else:
                 tweet['deletehash'] = 'TESTDELETEHASH'
                 tweet['link'] = 'http://DEBUG.DEBUG/DEBUG'
