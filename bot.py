@@ -9,7 +9,6 @@ import re
 import random
 
 import tweepy
-from imgurpython import ImgurClient
 
 from draw_medal import draw_medal
 
@@ -18,11 +17,13 @@ UPLOAD_TO_IMGUR = True
 TRACEABLE_MENTION = True
 POST_TWEET = True
 
-TWEETS_TO_GRAB = 2  # Per justification
+TWEETS_TO_GRAB = 1  # Per justification
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
-    'I SHOULD GET A MEDAL FOR '
+    'I SHOULD GET A MEDAL FOR ',
+    'I DESERVE AN AWARD FOR ',
+    'I SHOULD GET AN AWARD FOR '
 )
 
 REPLACEMENT_WORDS = tuple(zip("""
@@ -116,18 +117,6 @@ def get_medal_text(status, q):
             'src_status': src_status.text}
 
 
-def imgur_upload_medal(path, uname, medal_text):
-    client = ImgurClient(os.environ.get('IMGUR_CLIENT_ID'),
-                         os.environ.get('IMGUR_SECRET'))
-
-    config = {
-        'title': 'A medal for ' + uname,
-        'description': medal_text,
-    }
-    imgur_img = client.upload_from_path(path, config=config, anon=False)
-    # print(imgur_img)
-    return imgur_img
-
 if __name__ == "__main__":
 
     twapi = get_twapi()
@@ -156,17 +145,6 @@ if __name__ == "__main__":
                 tweet['fn'] = draw_medal(uname=tweet['medal_uname'],
                                          text=tweet['medal_text'])
 
-                # Upload the medal
-                if UPLOAD_TO_IMGUR:
-                    imgur_data = imgur_upload_medal(tweet['fn'],
-                                                    uname=tweet['medal_uname'],
-                                                    medal_text=tweet['medal_text'])
-                    tweet['deletehash'] = imgur_data['deletehash']
-                    tweet['link'] = imgur_data['link']
-                else:
-                    tweet['deletehash'] = 'TESTDELETEHASH'
-                    tweet['link'] = 'http://DEBUG.DEBUG/DEBUG'
-
                 # Tweet the medal
                 reply_uname = ('@'+tweet['medal_uname']) if TRACEABLE_MENTION else tweet['medal_uname']
                 tweet['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
@@ -175,14 +153,13 @@ if __name__ == "__main__":
                                                       tweet['link']
                                                       )
                 if POST_TWEET:
-                    # twapi.update_with_media(filename=tweet['fn'],
-                    #                         status=tweet['status'],
-                    #                         in_reply_to_status_id=src_status.id)
-                    twapi.update_status(status=tweet['status'],
-                                        in_reply_to_status_id=src_status.id)
+                    twapi.update_with_media(filename=tweet['fn'],
+                                            status=tweet['status'],
+                                            in_reply_to_status_id=src_status.id)
+
                 print('{}: {} => {} ({})'.format(src_status.id,
                                                  tweet['src_status'],
                                                  tweet['status'],
                                                  tweet['deletehash']))
 
-        time.sleep(3600)  # 60 minutes
+        time.sleep(7200)  # 60 minutes
