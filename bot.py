@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Based on https://github.com/zwass/heroku-twitterbot-starter
 
@@ -13,7 +13,6 @@ import tweepy
 from draw_medal import draw_medal
 
 # DEBUG
-UPLOAD_TO_IMGUR = True
 TRACEABLE_MENTION = True
 POST_TWEET = True
 
@@ -21,9 +20,9 @@ TWEETS_TO_GRAB = 1  # Per justification
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
-    'I SHOULD GET A MEDAL FOR ',
+    # 'I SHOULD GET A MEDAL FOR ',
     'I DESERVE AN AWARD FOR ',
-    'I SHOULD GET AN AWARD FOR '
+    # 'I SHOULD GET AN AWARD FOR '
 )
 
 REPLACEMENT_WORDS = tuple(zip("""
@@ -147,19 +146,17 @@ if __name__ == "__main__":
 
                 # Tweet the medal
                 reply_uname = ('@'+tweet['medal_uname']) if TRACEABLE_MENTION else tweet['medal_uname']
-                tweet['status'] = '{} {}{} {}'.format(random.choice(CONGRATS),
+                tweet['status'] = '{} {}{}'.format(random.choice(CONGRATS),
                                                       reply_uname,
-                                                      random.choice('.!'),
-                                                      tweet['link']
+                                                      random.choice('.!')
                                                       )
                 if POST_TWEET:
                     twapi.update_with_media(filename=tweet['fn'],
                                             status=tweet['status'],
                                             in_reply_to_status_id=src_status.id)
 
-                print('{}: {} => {} ({})'.format(src_status.id,
+                print('{}: {} => {}'.format(src_status.id,
                                                  tweet['src_status'],
-                                                 tweet['status'],
-                                                 tweet['deletehash']))
+                                                 tweet['status']))
 
         time.sleep(7200)  # 60 minutes
