@@ -1,7 +1,10 @@
-bot.py does a search for up to 15 tweets that request an award. Then get_medal_text parses their tweet and returns a tuple or the user's Twitter handle and the text to go on the medal.
+# WDYWAM
+## What Do You Want, A Medal?
 
-draw_medal takes the tuple as input and creates a medal image (using ImageMagick).
+This Twitter bot searches for tweets containing phrases like “I should get an award for...”, parses the tweets into third-person phrasing, and replies to them with a drawing of an appropriate medal.
 
-TODO:
+### Under the hood
 
-Delete all tweets (for development)
+`bot` does a search for up to 15 tweets that request an award. Then `get_medal_text` parses the tweet and returns a tuple of the user's Twitter handle and the text to go on the medal.
+
+`draw_medal` takes the tuple as input and creates an appropriate medal image (using ImageMagick).
