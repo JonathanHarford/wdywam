@@ -14,7 +14,7 @@ from draw_medal import draw_medal
 
 # DEBUG
 TRACEABLE_MENTION = True
-POST_TWEET = True
+POST_TWEET = True  # Change to False for testing
 
 TWEETS_TO_GRAB = 1  # Per justification
 
