@@ -104,10 +104,9 @@ def get_medal_text(status, q):
     except ValueError:
         return
 
-    # Some characters are too ambiguous.
-    for chr in ('@', '#'):
-        if chr in medal_text:
-            return
+    if '@' in medal_text:
+        log("INVALID (username): " + status.text)
+        return
 
     # Replace I/ME/MY with THEY/THEM/THEIR
     for pair in REPLACEMENT_WORDS:
