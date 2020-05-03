@@ -16,7 +16,7 @@ from draw_medal import draw_medal
 TRACEABLE_MENTION = True
 POST_TWEET = True  # Change to False for testing
 
-TWEETS_TO_GRAB = 1  # Per justification
+TWEETS_TO_GRAB = 2  # Per justification
 
 JUSTIFICATIONS = (
     'I DESERVE A MEDAL FOR ',
