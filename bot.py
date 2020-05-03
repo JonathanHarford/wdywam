@@ -108,6 +108,9 @@ def get_medal_text(status, q):
         log("INVALID (username): " + status.text)
         return
 
+    # Decurlyfy
+    medal_text = medal_text.replace('“','"').replace('”','"').replace('’', "'")
+
     # Replace I/ME/MY with THEY/THEM/THEIR
     for pair in REPLACEMENT_WORDS:
         medal_text = re.sub(r'''\b''' + pair[0] + r'''\b''', pair[1], medal_text)
