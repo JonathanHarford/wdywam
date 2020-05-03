@@ -31,6 +31,7 @@ I'M
 I
 ME
 MY
+MYSELF
 AM
 """.strip().split(), """
 THEY'D
@@ -38,6 +39,7 @@ THEY'RE
 THEY
 THEM
 THEIR
+THEMSELF
 ARE
 """.strip().split()))
 
