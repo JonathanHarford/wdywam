@@ -56,6 +56,9 @@ CONGRATS = (
 forbidden_words = os.environ.get('FORBIDDEN_WORDS').split('-')
 forbidden_fragments = os.environ.get('FORBIDDEN_FRAGMENTS').split('-')
 
+def log(s):
+    pass
+    # print(s)
 
 def get_twapi():
     consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
@@ -73,20 +76,24 @@ def get_medal_text(status, q):
 
     # Ignore mentions (unless they're directly to @wdywam)
     if status.in_reply_to_user_id_str and not status.text.startswith('@wdywam'):
-        # print("INVALID (reply): " + status.text)
+        log("INVALID (reply): " + status.text)
         return
 
     if 'RT' in status.text:
-        # print("INVALID (retweet): " + status.text)
+        log("INVALID (retweet): " + status.text)
+        return
+
+    if 'HTTP' in status.text:
+        log("INVALID (link): " + status.text)
         return
 
     for word in forbidden_fragments:
         if word in status.text:
-            # print("INVALID (forbidden term): " + status.text)
+            log("INVALID (forbidden term): " + status.text)
             return
     for word in forbidden_words:
         if re.match(r'''\b''' + word + r'''\b''', status.text):
-            # print("INVALID (forbidden term): " + status.text)
+            log("INVALID (forbidden term): " + status.text)
             return
 
     # Split by "I deserve a medal for..."
@@ -108,7 +115,7 @@ def get_medal_text(status, q):
     medal_text = re.match(r'''[\w \+\-\'\"&$=@#,/]+''', medal_text).group(0)
 
     if len(medal_text) < 9:
-        # print("INVALID (too short): " + status.text)
+        # log("INVALID (too short): " + status.text)
         return
 
     return {'medal_uname': status.user.screen_name,
