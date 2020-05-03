@@ -85,7 +85,7 @@ def get_medal_text(status, q):
         log("INVALID (retweet): " + status.text)
         return
 
-    if 'HTTP' in status.text:
+    if 'http' in status.text:
         log("INVALID (link): " + status.text)
         return
 
