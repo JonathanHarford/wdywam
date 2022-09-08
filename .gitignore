@@ -1,15 +1,8 @@
 .idea/
 
-#setup_env.sh contains Twitter API credentials. Don't commit!
-setup_env.sh
-
-init.sh
-*.jpg  # The original medal is a .jpEg
-
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
 # C extensions
 *.so
+/.DS_Store

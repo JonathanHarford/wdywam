@@ -9,3 +9,5 @@ This Twitter bot searches for tweets containing phrases like “I should get an 
 `bot` does a search for up to 15 tweets that request an award. Then `get_medal_text` parses the tweet and returns a tuple of the user's Twitter handle and the text to go on the medal.
 
 `draw_medal` takes the tuple as input and creates an appropriate medal image (using ImageMagick).
+
+Created with https://github.com/zwass/heroku-twitterbot-starter
